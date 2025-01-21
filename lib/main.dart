@@ -47,38 +47,40 @@ import 'di_container.dart' as di;
 import 'provider/time_provider.dart';
 import 'view/base/cookies_view.dart';
 
-
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 
 late AndroidNotificationChannel channel;
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-
-
 Future<void> main() async {
-
-  if(ResponsiveHelper.isMobilePhone()) {
+  if (ResponsiveHelper.isMobilePhone()) {
     HttpOverrides.global = MyHttpOverrides();
   }
   setPathUrlStrategy();
   WidgetsFlutterBinding.ensureInitialized();
 
-  if(!kIsWeb) {
+  if (!kIsWeb) {
     await Firebase.initializeApp();
-    if(defaultTargetPlatform == TargetPlatform.android){
+    if (defaultTargetPlatform == TargetPlatform.android) {
       await FirebaseMessaging.instance.requestPermission();
     }
-
   } else {
-    await Firebase.initializeApp(options: const FirebaseOptions(
-      apiKey: "AIzaSyAMLk1-dj8g0qCqU3DkxLKHbrT0VhK5EeQ",
-      authDomain: "e-food-9e6e3.firebaseapp.com",
-      projectId: "e-food-9e6e3",
-      storageBucket: "e-food-9e6e3.appspot.com",
-      messagingSenderId: "410522356318",
-      appId: "1:410522356318:web:1f962a90aabeb82a3dc2cf",
-      measurementId: "G-X1LHXV0DK1",
-    ));
+    await Firebase.initializeApp(
+        options: const FirebaseOptions(
+            // apiKey: "AIzaSyAMLk1-dj8g0qCqU3DkxLKHbrT0VhK5EeQ",
+            // authDomain: "e-food-9e6e3.firebaseapp.com",
+            // projectId: "e-food-9e6e3",
+            // storageBucket: "e-food-9e6e3.appspot.com",
+            // messagingSenderId: "410522356318",
+            // appId: "1:410522356318:web:1f962a90aabeb82a3dc2cf",
+            // measurementId: "G-X1LHXV0DK1",
+            apiKey: "AIzaSyCRuHYcgMpj-CdyLCQ-RNBtCOcPgileI04",
+            authDomain: "food-solutions-1d554.firebaseapp.com",
+            projectId: "food-solutions-1d554",
+            storageBucket: "food-solutions-1d554.appspot.com",
+            messagingSenderId: "188943905318",
+            appId: "1:188943905318:web:d3c5097e54203da1bc6ce7"));
 
     await FacebookAuth.instance.webAndDesktopInitialize(
       appId: "482889663914976",
@@ -86,7 +88,6 @@ Future<void> main() async {
       xfbml: true,
       version: "v13.0",
     );
-
   }
   await di.init();
   String? path;
@@ -94,23 +95,27 @@ Future<void> main() async {
   int? orderID;
   try {
     if (!kIsWeb) {
-      path =  await initDynamicLinks();
+      path = await initDynamicLinks();
       channel = const AndroidNotificationChannel(
         'high_importance_channel',
         'High Importance Notifications',
         importance: Importance.high,
       );
     }
-    final RemoteMessage? remoteMessage = await FirebaseMessaging.instance.getInitialMessage();
+    final RemoteMessage? remoteMessage =
+        await FirebaseMessaging.instance.getInitialMessage();
     if (remoteMessage != null) {
-      orderID = remoteMessage.notification!.titleLocKey != null ? int.parse(remoteMessage.notification!.titleLocKey!) : null;
+      orderID = remoteMessage.notification!.titleLocKey != null
+          ? int.parse(remoteMessage.notification!.titleLocKey!)
+          : null;
     }
     await NotificationHelper.initialize(flutterLocalNotificationsPlugin);
     FirebaseMessaging.onBackgroundMessage(myBackgroundMessageHandler);
-    await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.createNotificationChannel(channel);
-
-
-  }catch(e) {
+    await flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(channel);
+  } catch (e) {
     debugPrint('error ===> $e');
   }
   GoRouter.optionURLReflectsImperativeAPIs = true;
@@ -124,16 +129,19 @@ Future<void> main() async {
       ChangeNotifierProvider(create: (context) => di.sl<CategoryProvider>()),
       ChangeNotifierProvider(create: (context) => di.sl<BannerProvider>()),
       ChangeNotifierProvider(create: (context) => di.sl<ProductProvider>()),
-      ChangeNotifierProvider(create: (context) => di.sl<LocalizationProvider>()),
+      ChangeNotifierProvider(
+          create: (context) => di.sl<LocalizationProvider>()),
       ChangeNotifierProvider(create: (context) => di.sl<AuthProvider>()),
       ChangeNotifierProvider(create: (context) => di.sl<LocationProvider>()),
-      ChangeNotifierProvider(create: (context) => di.sl<LocalizationProvider>()),
+      ChangeNotifierProvider(
+          create: (context) => di.sl<LocalizationProvider>()),
       ChangeNotifierProvider(create: (context) => di.sl<CartProvider>()),
       ChangeNotifierProvider(create: (context) => di.sl<OrderProvider>()),
       ChangeNotifierProvider(create: (context) => di.sl<ChatProvider>()),
       ChangeNotifierProvider(create: (context) => di.sl<SetMenuProvider>()),
       ChangeNotifierProvider(create: (context) => di.sl<ProfileProvider>()),
-      ChangeNotifierProvider(create: (context) => di.sl<NotificationProvider>()),
+      ChangeNotifierProvider(
+          create: (context) => di.sl<NotificationProvider>()),
       ChangeNotifierProvider(create: (context) => di.sl<CouponProvider>()),
       ChangeNotifierProvider(create: (context) => di.sl<WishListProvider>()),
       ChangeNotifierProvider(create: (context) => di.sl<SearchProvider>()),
@@ -151,8 +159,9 @@ class MyApp extends StatefulWidget {
   final int? orderId;
   final bool isWeb;
   final String? route;
-  const MyApp({Key? key, required this.orderId, required this.isWeb, this.route}) : super(key: key);
-
+  const MyApp(
+      {Key? key, required this.orderId, required this.isWeb, this.route})
+      : super(key: key);
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -164,52 +173,50 @@ Future<String?> initDynamicLinks() async {
   String? path;
   if (uri != null) {
     path = uri.path;
-
-  }else{
+  } else {
     path = null;
   }
   return path;
-
 }
-
 
 class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
 
-    if(kIsWeb || widget.route != null) {
+    if (kIsWeb || widget.route != null) {
       Provider.of<SplashProvider>(context, listen: false).initSharedData();
       Provider.of<CartProvider>(context, listen: false).getCartData();
       Provider.of<SplashProvider>(context, listen: false).getPolicyPage();
 
-      if(Provider.of<AuthProvider>(context, listen: false).isLoggedIn()) {
+      if (Provider.of<AuthProvider>(context, listen: false).isLoggedIn()) {
         Provider.of<ProfileProvider>(context, listen: false).getUserInfo(true);
       }
-
 
       _route();
     }
 
-    Provider.of<LocationProvider>(context, listen: false).checkPermission(()=>
-        Provider.of<LocationProvider>(context, listen: false).getCurrentLocation(context, false).then((currentPosition) {
-        }), context,
-    );
-
+    // Provider.of<LocationProvider>(context, listen: false).checkPermission(
+    //   () => Provider.of<LocationProvider>(context, listen: false)
+    //       .getCurrentLocation(context, false)
+    //       .then((currentPosition) {}),
+    //   context,
+    // );
   }
+
   void _route() {
-    Provider.of<SplashProvider>(context, listen: false).initConfig(context).then((bool isSuccess) {
-
+    Provider.of<SplashProvider>(context, listen: false)
+        .initConfig(context)
+        .then((bool isSuccess) {
       if (isSuccess) {
-        Timer(Duration(seconds: ResponsiveHelper.isMobilePhone() ? 1 : 0), () async {
-
+        Timer(Duration(seconds: ResponsiveHelper.isMobilePhone() ? 1 : 0),
+            () async {
           if (Provider.of<AuthProvider>(context, listen: false).isLoggedIn()) {
             Provider.of<AuthProvider>(context, listen: false).updateToken();
           }
-          await Provider.of<WishListProvider>(context, listen: false).initWishList();
-        }
-
-        );
+          await Provider.of<WishListProvider>(context, listen: false)
+              .initWishList();
+        });
       }
     });
   }
@@ -222,49 +229,68 @@ class _MyAppState extends State<MyApp> {
     }
 
     return Consumer<SplashProvider>(
-      builder: (context, splashProvider, child){
-        return (kIsWeb && splashProvider.configModel == null) ? const SizedBox() : MaterialApp.router(
-          routerConfig: RouterHelper.goRoutes,
-          title: splashProvider.configModel != null ? splashProvider.configModel!.restaurantName ?? '' : AppConstants.appName,
-          debugShowCheckedModeBanner: false,
-          theme: Provider.of<ThemeProvider>(context).darkTheme ? dark : light,
-          locale: Provider.of<LocalizationProvider>(context).locale,
-          localizationsDelegates: const [
-            AppLocalization.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: locals,
-          scrollBehavior: const MaterialScrollBehavior().copyWith(dragDevices: {
-            PointerDeviceKind.mouse, PointerDeviceKind.touch, PointerDeviceKind.stylus, PointerDeviceKind.unknown
-          }),
-          builder: (context, child)=> MediaQuery(
-            data: MediaQuery.of(context).copyWith(textScaleFactor: 1),
-            child: Scaffold(
-              body: Stack(
-                children: [
-                  child!,
-
-                  if(ResponsiveHelper.isDesktop(context)) const Positioned.fill(
-                    child: Align(alignment: Alignment.bottomRight, child: Padding(
-                      padding: EdgeInsets.symmetric(vertical: 50, horizontal: 20), child: ThirdPartyChatWidget(),
-                    )),
-                  ),
-
-                  if(kIsWeb && splashProvider.configModel!.cookiesManagement != null &&
-                      splashProvider.configModel!.cookiesManagement!.status!
-                      && !splashProvider.getAcceptCookiesStatus(splashProvider.configModel!.cookiesManagement!.content)
-                      && splashProvider.cookiesShow)
-                    const Positioned.fill(child: Align(alignment: Alignment.bottomCenter, child: CookiesView())),
-
+      builder: (context, splashProvider, child) {
+        return (kIsWeb && splashProvider.configModel == null)
+            ? const SizedBox()
+            : MaterialApp.router(
+                routerConfig: RouterHelper.goRoutes,
+                title: splashProvider.configModel != null
+                    ? splashProvider.configModel!.restaurantName ?? ''
+                    : AppConstants.appName,
+                debugShowCheckedModeBanner: false,
+                theme: Provider.of<ThemeProvider>(context).darkTheme
+                    ? dark
+                    : light,
+                locale: Provider.of<LocalizationProvider>(context).locale,
+                localizationsDelegates: const [
+                  AppLocalization.delegate,
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate,
+                  GlobalCupertinoLocalizations.delegate,
                 ],
-              ),
-            ),
-          ),
-        );
+                supportedLocales: locals,
+                scrollBehavior:
+                    const MaterialScrollBehavior().copyWith(dragDevices: {
+                  PointerDeviceKind.mouse,
+                  PointerDeviceKind.touch,
+                  PointerDeviceKind.stylus,
+                  PointerDeviceKind.unknown
+                }),
+                builder: (context, child) => MediaQuery(
+                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1),
+                  child: Scaffold(
+                    body: Stack(
+                      children: [
+                        child!,
+                        if (ResponsiveHelper.isDesktop(context))
+                          const Positioned.fill(
+                            child: Align(
+                                alignment: Alignment.bottomRight,
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: 50, horizontal: 20),
+                                  child: ThirdPartyChatWidget(),
+                                )),
+                          ),
+                        if (kIsWeb &&
+                            splashProvider.configModel!.cookiesManagement !=
+                                null &&
+                            splashProvider
+                                .configModel!.cookiesManagement!.status! &&
+                            !splashProvider.getAcceptCookiesStatus(
+                                splashProvider
+                                    .configModel!.cookiesManagement!.content) &&
+                            splashProvider.cookiesShow)
+                          const Positioned.fill(
+                              child: Align(
+                                  alignment: Alignment.bottomCenter,
+                                  child: CookiesView())),
+                      ],
+                    ),
+                  ),
+                ),
+              );
       },
-
     );
   }
 }
@@ -272,7 +298,9 @@ class _MyAppState extends State<MyApp> {
 class MyHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
-    return super.createHttpClient(context)..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
   }
 }
 
@@ -280,5 +308,3 @@ class Get {
   static BuildContext? get context => navigatorKey.currentContext;
   static NavigatorState? get navigator => navigatorKey.currentState;
 }
-
-

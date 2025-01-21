@@ -22,7 +22,6 @@ import 'package:flutter_restaurant/view/screens/branch/widget/bracnh_cart_view.d
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-
 import 'package:provider/provider.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
@@ -43,31 +42,32 @@ class _BranchListScreenState extends State<BranchListScreen> {
   LatLng? _currentLocationLatLng;
   AutoScrollController? scrollController;
 
+
+
+
+
   @override
   void initState() {
     final branchProvider = Provider.of<BranchProvider>(context, listen: false);
     branchProvider.updateTabIndex(0, isUpdate: false);
-
     ///if need to previous selection
-    if (branchProvider.getBranchId() == -1) {
+    if(branchProvider.getBranchId() == -1) {
       branchProvider.updateBranchId(null, isUpdate: false);
-    } else {
-      branchProvider.updateBranchId(branchProvider.getBranchId(),
-          isUpdate: false);
+    } else{
+      branchProvider.updateBranchId(branchProvider.getBranchId(),isUpdate: false);
     }
 
-    Provider.of<LocationProvider>(context, listen: false)
-        .getCurrentLatLong()
-        .then((latLong) {
-      if (latLong != null) {
+
+    Provider.of<LocationProvider>(context, listen: false).getCurrentLatLong().then((latLong){
+      if(latLong != null) {
         _currentLocationLatLng = latLong;
       }
       _branchesValue = branchProvider.branchSort(_currentLocationLatLng);
     });
 
+
     scrollController = AutoScrollController(
-      viewportBoundaryGetter: () =>
-          Rect.fromLTRB(0, 0, 0, MediaQuery.of(context).padding.bottom),
+      viewportBoundaryGetter: () => Rect.fromLTRB(0, 0, 0, MediaQuery.of(context).padding.bottom),
       axis: Axis.horizontal,
     );
 
@@ -76,366 +76,257 @@ class _BranchListScreenState extends State<BranchListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final SplashProvider splashProvider =
-        Provider.of<SplashProvider>(context, listen: false);
+    final SplashProvider splashProvider = Provider.of<SplashProvider>(context, listen: false);
     return Consumer<BranchProvider>(builder: (context, branchProvider, _) {
-      return WillPopScope(
-        onWillPop: () async {
-          if (branchProvider.branchTabIndex != 0) {
-            branchProvider.updateTabIndex(0);
-            return false;
-          } else {
-            return true;
-          }
-        },
-        child: Scaffold(
-          appBar: (ResponsiveHelper.isDesktop(context)
-                  ? const PreferredSize(
-                      preferredSize: Size.fromHeight(100), child: WebAppBar())
-                  : CustomAppBar(
-                      context: context,
-                      title: getTranslated('select_branch', context)))
-              as PreferredSizeWidget?,
-          body: Center(
-              child: SizedBox(
-            width: Dimensions.webScreenWidth,
-            child: splashProvider.getActiveBranch() == 0
-                ? const BranchCloseView()
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                        Expanded(
-                          child: branchProvider.branchTabIndex == 1
-                              ? Stack(
-                                  children: [
-                                    GoogleMap(
-                                      mapType: MapType.normal,
-                                      initialCameraPosition: CameraPosition(
-                                        target: LatLng(
-                                          double.parse(_branchesValue[0]
-                                              .branches!
-                                              .latitude!),
-                                          double.parse(_branchesValue[0]
-                                              .branches!
-                                              .longitude!),
-                                        ),
-                                        zoom: 5,
-                                      ),
-                                      minMaxZoomPreference:
-                                          const MinMaxZoomPreference(0, 16),
-                                      zoomControlsEnabled: true,
-                                      markers: _markers,
-                                      onMapCreated: (GoogleMapController
-                                          controller) async {
-                                        await Geolocator.requestPermission();
-                                        _mapController = controller;
-                                        // _loading = false;
-                                        _setMarkers(1);
-                                      },
-                                    ),
-                                    Positioned.fill(
-                                        child: Align(
-                                      alignment: Alignment.bottomCenter,
-                                      child: SingleChildScrollView(
-                                        controller: scrollController,
-                                        scrollDirection: Axis.horizontal,
-                                        child: Row(
-                                          children: _branchesValue
-                                              .map((branchValue) =>
-                                                  AutoScrollTag(
-                                                    controller:
-                                                        scrollController!,
-                                                    key: ValueKey(_branchesValue
-                                                        .indexOf(branchValue)),
-                                                    index: _branchesValue
-                                                        .indexOf(branchValue),
-                                                    child: BranchCartView(
-                                                      branchModel: branchValue,
-                                                      branchModelList:
-                                                          _branchesValue,
-                                                      onTap: () => _setMarkers(
-                                                          _branchesValue
-                                                              .indexOf(
-                                                                  branchValue),
-                                                          fromBranchSelect:
-                                                              true),
-                                                    ),
-                                                  ))
-                                              .toList(),
-                                        ),
-                                      ),
-                                    )),
-                                  ],
-                                )
-                              : Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: Dimensions.paddingSizeSmall,
-                                      horizontal:
-                                          Dimensions.paddingSizeDefault),
-                                  child: Column(children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                            '${getTranslated('nearest_branch', context)} (${_branchesValue.length})',
-                                            style: rubikBold),
-                                        GestureDetector(
-                                          onTap: () =>
-                                              branchProvider.updateTabIndex(1),
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(30),
-                                              border: Border.all(
-                                                  color: Theme.of(context)
-                                                      .primaryColor),
-                                            ),
-                                            child: Row(
-                                              children: [
-                                                Container(
-                                                  height: 25,
-                                                  width: 25,
-                                                  decoration: BoxDecoration(
-                                                      color: Theme.of(context)
-                                                          .primaryColor,
-                                                      borderRadius: Provider.of<
-                                                                      LocalizationProvider>(
-                                                                  context,
-                                                                  listen: false)
-                                                              .isLtr
-                                                          ? const BorderRadius
-                                                              .only(
-                                                              bottomLeft: Radius
-                                                                  .circular(30),
-                                                              topLeft: Radius
-                                                                  .circular(30),
-                                                            )
-                                                          : const BorderRadius
-                                                              .only(
-                                                              bottomRight:
-                                                                  Radius
-                                                                      .circular(
-                                                                          30),
-                                                              topRight: Radius
-                                                                  .circular(30),
-                                                            )),
-                                                  child: const Icon(
-                                                    Icons.my_location_rounded,
-                                                    color: Colors.white,
-                                                    size: Dimensions
-                                                        .paddingSizeDefault,
-                                                  ),
-                                                ),
-                                                Padding(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                      horizontal: Dimensions
-                                                          .paddingSizeExtraSmall),
-                                                  child: Text(
-                                                    getTranslated(
-                                                        'select_from_map',
-                                                        context)!,
-                                                    style: rubikMedium.copyWith(
-                                                        color: Theme.of(context)
-                                                            .primaryColor),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                    const SizedBox(
-                                        height: Dimensions.paddingSizeDefault),
-                                    _branchesValue.isNotEmpty
-                                        ? Flexible(
-                                            child: GridView.builder(
-                                            gridDelegate:
-                                                SliverGridDelegateWithFixedCrossAxisCount(
-                                              crossAxisSpacing: 50,
-                                              mainAxisSpacing: ResponsiveHelper
-                                                      .isDesktop(context)
-                                                  ? Dimensions.paddingSizeLarge
-                                                  : 0.01,
-                                              childAspectRatio:
-                                                  ResponsiveHelper.isDesktop(
-                                                          context)
-                                                      ? 3.6
-                                                      : 2.8,
-                                              crossAxisCount:
-                                                  ResponsiveHelper.isDesktop(
-                                                          context)
-                                                      ? 2
-                                                      : MediaQuery.of(context)
-                                                                  .size
-                                                                  .width >
-                                                              780
-                                                          ? 2
-                                                          : 1,
-                                            ),
-                                            itemCount: _branchesValue.length,
-                                            itemBuilder: (context, index) =>
-                                                BranchItemView(
-                                              branchesValue:
-                                                  _branchesValue[index],
-                                            ),
-                                          ))
-                                        : const CircularProgressIndicator(),
-                                  ]),
-                                ),
-                        ),
-                        Container(
-                          width: ResponsiveHelper.isDesktop(context)
-                              ? 400
-                              : Dimensions.webScreenWidth,
-                          padding:
-                              const EdgeInsets.all(Dimensions.fontSizeDefault)
-                                  .copyWith(
-                                      bottom: Dimensions.paddingSizeDefault),
-                          child: Consumer<BranchProvider>(
-                              builder: (context, branchProvider, _) {
-                            final cartProvider = Provider.of<CartProvider>(
-                                context,
-                                listen: false);
-                            return CustomButton(
-                                btnTxt:
-                                    getTranslated('confirm_branch', context),
-                                borderRadius: 30,
-                                onTap: () {
-                                  if (branchProvider.selectedBranchId != null) {
-                                    if (branchProvider.selectedBranchId !=
-                                            branchProvider.getBranchId() &&
-                                        cartProvider.cartList.isNotEmpty) {
-                                      showAnimatedDialog(
-                                        context,
-                                        CustomDialog(
-                                          buttonTextTrue:
-                                              getTranslated('yes', context),
-                                          buttonTextFalse:
-                                              getTranslated('no', context),
-                                          description: '',
-                                          icon: Icons.question_mark,
-                                          title: getTranslated(
-                                              'you_have_some_food', context),
-                                          onTapTrue: () {
-                                            cartProvider.clearCartList();
-                                            _setBranch();
-                                          },
-                                          onTapFalse: () => context.pop(),
-                                        ),
-                                        dismissible: false,
-                                        isFlip: true,
-                                      );
-                                    } else {
-                                      if (branchProvider.branchTabIndex != 0) {
-                                        branchProvider.updateTabIndex(0,
-                                            isUpdate: false);
-                                      }
+        return WillPopScope(
+          onWillPop: () async {
+            if (branchProvider.branchTabIndex != 0) {
+              branchProvider.updateTabIndex(0);
+              return false;
+            } else {
+              return true;
+            }
+          },
+          child: Scaffold(
+            appBar: (ResponsiveHelper.isDesktop(context)
+                ? const PreferredSize(preferredSize: Size.fromHeight(100), child: WebAppBar())
+                : CustomAppBar(context: context, title: getTranslated('select_branch', context))) as PreferredSizeWidget?,
 
-                                      _setBranch();
-                                    }
-                                  } else {
-                                    showCustomSnackBar(getTranslated(
-                                        'select_branch_first', context));
-                                  }
-                                });
-                          }),
+            body: Center(child: SizedBox(
+              width: Dimensions.webScreenWidth,
+              child: splashProvider.getActiveBranch() == 0 ? const BranchCloseView() :
+              Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+                  Expanded(
+                    child: branchProvider.branchTabIndex == 1 ? Stack(
+                      children: [
+                        GoogleMap(
+                          mapType: MapType.normal,
+                          initialCameraPosition: CameraPosition(
+                            target: LatLng(
+                              double.parse(_branchesValue[0].branches!.latitude!),
+                              double.parse(_branchesValue[0].branches!.longitude!),
+                            ), zoom: 5,
+                          ),
+                          minMaxZoomPreference: const MinMaxZoomPreference(0, 16),
+                          zoomControlsEnabled: true,
+                          markers: _markers,
+                          onMapCreated: (GoogleMapController controller) async {
+                            await Geolocator.requestPermission();
+                            _mapController = controller;
+                            // _loading = false;
+                            _setMarkers(1);
+                          },
                         ),
+
+                        Positioned.fill(child: Align(
+                          alignment: Alignment.bottomCenter,
+                          child: SingleChildScrollView(
+                            controller: scrollController,
+                            scrollDirection: Axis.horizontal,
+                            child: Row(children: _branchesValue.map((branchValue) => AutoScrollTag(
+                              controller: scrollController!,
+                              key: ValueKey(_branchesValue.indexOf(branchValue)),
+                              index: _branchesValue.indexOf(branchValue),
+                              child: BranchCartView(
+                                branchModel: branchValue,
+                                branchModelList: _branchesValue,
+                                onTap: ()=> _setMarkers(_branchesValue.indexOf(branchValue), fromBranchSelect: true),
+                              ),
+                            )).toList(),
+                            ),
+                          ),
+                        )),
+
+
+                      ],
+                    ) : Padding(
+                      padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall, horizontal: Dimensions.paddingSizeDefault),
+                      child: Column(children: [
+                        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                          Text('${getTranslated('nearest_branch', context)} (${_branchesValue.length})', style: rubikBold),
+
+                          GestureDetector(
+                            onTap: ()=> branchProvider.updateTabIndex(1),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(30),
+                                border: Border.all(color: Theme.of(context).primaryColor),
+
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    height: 25, width: 25,
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context).primaryColor,
+                                      borderRadius: Provider.of<LocalizationProvider>(context, listen: false).isLtr ?
+                                      const BorderRadius.only(
+                                        bottomLeft: Radius.circular(30),
+                                        topLeft: Radius.circular(30),
+                                      ) : const BorderRadius.only(
+                                        bottomRight: Radius.circular(30),
+                                        topRight: Radius.circular(30),
+                                      )),
+                                    child: const Icon(Icons.my_location_rounded, color: Colors.white, size: Dimensions.paddingSizeDefault,),
+                                  ),
+
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeExtraSmall),
+                                    child: Text(
+                                      getTranslated('select_from_map', context)!,
+                                      style: rubikMedium.copyWith(color: Theme.of(context).primaryColor),
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                            ),
+                          )
+
+                        ],),
+                        const SizedBox(height: Dimensions.paddingSizeDefault),
+
+                        _branchesValue.isNotEmpty ? Flexible(child: GridView.builder(
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisSpacing: 50,
+                            mainAxisSpacing: ResponsiveHelper.isDesktop(context) ? Dimensions.paddingSizeLarge : 0.01,
+                            childAspectRatio: ResponsiveHelper.isDesktop(context) ? 3.6 : 2.8,
+                            crossAxisCount: ResponsiveHelper.isDesktop(context) ? 2 : MediaQuery.of(context).size.width > 780 ? 2 : 1,
+                          ),
+                          itemCount: _branchesValue.length,
+                          itemBuilder: (context, index) => BranchItemView(
+                            branchesValue: _branchesValue[index],
+                          ),
+                        )) : const CircularProgressIndicator(),
+
                       ]),
-          )),
-        ),
-      );
-    });
+                    ),
+                  ),
+
+                  Container(
+                    width: ResponsiveHelper.isDesktop(context) ? 400 : Dimensions.webScreenWidth,
+                    padding: const EdgeInsets.all(Dimensions.fontSizeDefault).copyWith(bottom: Dimensions.paddingSizeDefault),
+                    child: Consumer<BranchProvider>(builder: (context,branchProvider, _) {
+                      final cartProvider = Provider.of<CartProvider>(context, listen: false);
+                      return CustomButton(
+                          btnTxt: getTranslated('confirm_branch', context),
+                          borderRadius: 30, onTap: (){
+                        if(branchProvider.selectedBranchId != null) {
+                          if(branchProvider.selectedBranchId != branchProvider.getBranchId() && cartProvider.cartList.isNotEmpty) {
+                            showAnimatedDialog(
+                              context, CustomDialog(
+                              buttonTextTrue: getTranslated('yes', context),
+                              buttonTextFalse: getTranslated('no', context),
+                              description: '',
+                              icon: Icons.question_mark,
+                              title: getTranslated('you_have_some_food', context),
+                              onTapTrue: (){
+                                cartProvider.clearCartList();
+                                _setBranch();
+                              },
+                              onTapFalse: ()=> context.pop(),
+                            ), dismissible: false, isFlip: true,
+                            );
+                          }else{
+                            if(branchProvider.branchTabIndex != 0) {
+                              branchProvider.updateTabIndex(0, isUpdate: false);
+                            }
+
+                            _setBranch();
+
+                          }
+
+
+                        }else{
+                          showCustomSnackBar(getTranslated('select_branch_first', context));
+                        }
+                      });
+                    }),
+                  ),
+                ]),
+            )),
+
+
+
+          ),
+        );
+      }
+    );
   }
 
   void _setBranch() {
+
     final branchProvider = Provider.of<BranchProvider>(context, listen: false);
-    if (branchProvider.getBranchId() != branchProvider.selectedBranchId) {
+    if(branchProvider.getBranchId() != branchProvider.selectedBranchId) {
       branchProvider.setBranch(branchProvider.selectedBranchId!);
       RouterHelper.getMainRoute(action: RouteAction.pushNamedAndRemoveUntil);
-      showCustomSnackBar(getTranslated('branch_successfully_selected', context),
-          isError: false);
-    } else {
+      showCustomSnackBar(getTranslated('branch_successfully_selected', context), isError: false);
+    }else{
       showCustomSnackBar(getTranslated('this_is_your_current_branch', context));
     }
+
   }
 
+
   void _setMarkers(int selectedIndex, {bool fromBranchSelect = false}) async {
-    await scrollController!.scrollToIndex(selectedIndex,
-        preferPosition: AutoScrollPosition.middle);
+    await scrollController!.scrollToIndex(selectedIndex, preferPosition: AutoScrollPosition.middle);
     await scrollController!.highlight(selectedIndex);
 
     late BitmapDescriptor bitmapDescriptor;
     late BitmapDescriptor bitmapDescriptorUnSelect;
     late BitmapDescriptor currentLocationDescriptor;
 
-    await BitmapDescriptor.fromAssetImage(
-            const ImageConfiguration(size: Size(30, 50)),
-            Images.restaurantMarker)
-        .then((marker) {
+    await BitmapDescriptor.fromAssetImage(const ImageConfiguration(size: Size(30, 50)), Images.restaurantMarker).then((marker) {
       bitmapDescriptor = marker;
     });
 
-    await BitmapDescriptor.fromAssetImage(
-            const ImageConfiguration(size: Size(25, 40)),
-            Images.restaurantMarkerUnselect)
-        .then((marker) {
+    await BitmapDescriptor.fromAssetImage(const ImageConfiguration(size: Size(25, 40)), Images.restaurantMarkerUnselect).then((marker) {
       bitmapDescriptorUnSelect = marker;
     });
 
-    await BitmapDescriptor.fromAssetImage(
-            const ImageConfiguration(size: Size(30, 50)),
-            Images.currentLocationMarker)
-        .then((marker) {
+    await BitmapDescriptor.fromAssetImage(const ImageConfiguration(size: Size(30, 50)), Images.currentLocationMarker).then((marker) {
       currentLocationDescriptor = marker;
     });
 
     // Marker
     _markers = HashSet<Marker>();
-    for (int index = 0; index < _branchesValue.length; index++) {
+    for(int index=0; index <_branchesValue.length; index++) {
+
       _markers.add(Marker(
         onTap: () async {
-          if (_branchesValue[index].branches!.status!) {
-            Provider.of<BranchProvider>(context, listen: false)
-                .updateBranchId(_branchesValue[index].branches!.id);
-          }
-        },
+          if(_branchesValue[index].branches!.status!) {
+            Provider.of<BranchProvider>(context, listen: false).updateBranchId(_branchesValue[index].branches!.id);
+          }},
         markerId: MarkerId('branch_$index'),
-        position: LatLng(
-            double.parse(_branchesValue[index].branches!.latitude!),
-            double.parse(_branchesValue[index].branches!.longitude!)),
-        infoWindow: InfoWindow(
-            title: _branchesValue[index].branches!.name,
-            snippet: _branchesValue[index].branches!.address),
-        visible: _branchesValue[index].branches!.status!,
-        icon: selectedIndex == index
-            ? bitmapDescriptor
-            : bitmapDescriptorUnSelect,
+        position: LatLng(double.parse(_branchesValue[index].branches!.latitude!), double.parse(_branchesValue[index].branches!.longitude!)),
+        infoWindow: InfoWindow(title: _branchesValue[index].branches!.name, snippet:_branchesValue[index].branches!.address), visible: _branchesValue[index].branches!.status! ,
+        icon: selectedIndex == index ? bitmapDescriptor : bitmapDescriptorUnSelect,
       ));
     }
-    if (_currentLocationLatLng != null) {
+    if(_currentLocationLatLng != null) {
       _markers.add(Marker(
         markerId: const MarkerId('current_location'),
         position: _currentLocationLatLng!,
-        infoWindow: InfoWindow(
-            title: getTranslated('current_location', Get.context!),
-            snippet: ''),
+        infoWindow: InfoWindow(title: getTranslated('current_location', Get.context!), snippet: ''),
         icon: currentLocationDescriptor,
       ));
     }
 
     _mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
-      target: _currentLocationLatLng != null && !fromBranchSelect
-          ? _currentLocationLatLng!
-          : LatLng(
-              double.parse(_branchesValue[selectedIndex].branches!.latitude!),
-              double.parse(_branchesValue[selectedIndex].branches!.longitude!),
-            ),
+      target: _currentLocationLatLng != null && !fromBranchSelect ? _currentLocationLatLng! : LatLng(
+        double.parse(_branchesValue[selectedIndex].branches!.latitude!),
+        double.parse(_branchesValue[selectedIndex].branches!.longitude!),
+      ),
       zoom: ResponsiveHelper.isMobile() ? 12 : 16,
     )));
 
     setState(() {});
   }
+
+
+
+
 }
+
+
+

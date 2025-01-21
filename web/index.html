@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <!--
     If you are serving your web app in a path other than the root, change the
@@ -27,12 +28,16 @@
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" type="text/css" href="style.css">
 
-  <link rel="shortcut icon" type="image/png" href="favicon.png"/>
+  <link rel="shortcut icon" type="image/png" href="favicon.png" />
 
   <link rel="preload" href="assets/logo.png" as="image">
   <link rel="preload" href="assets/header_icon_1.png" as="image">
   <link rel="preload" href="assets/header_icon_2.png" as="image">
-  <style>.grecaptcha-badge { visibility: hidden;} </style>
+  <style>
+    .grecaptcha-badge {
+      visibility: hidden;
+    }
+  </style>
 
 
 
@@ -40,92 +45,113 @@
 
   <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_MAP_KEY_HERE&callback=Function.prototype"></script>
 </head>
+
 <body>
 
-<div class="preloader">
-  <div class="preloader-container">
-    <!-- <img width="80" class="preloader-img" src="assets/img/preloader.png" alt=""> -->
-    <div id="animation-container">
-      <img width="80" src="assets/loader_image_1.png" class="animation-image" alt="" />
-      <img width="80" src="assets/loader_image_2.png" class="animation-image" alt="" />
-      <img width="80" src="assets/loader_image_3.png" class="animation-image" alt="" />
-      <img width="80" src="assets/loader_image_4.png" class="animation-image" alt="" />
-      <img width="80" src="assets/loader_image_5.png" class="animation-image" alt="" />
-    </div>
-    <div class="loader"></div>
-  </div>
-</div>
-
-
-<!-- Header -->
-<header class="header">
-  <div class="header-top-line"></div>
-  <div class="header-container d-flex align-items-center justify-content-between">
-    <div class="header-start d-flex gap-5 align-items-center">
-      <img class="logo" src="assets/logo.png" loading="eager" alt="">
-      <div class="placeholder placeholder-wide"></div>
-      <div class="d-flex align-items-center gap-4">
-        <div class="placeholder"></div>
-        <div class="placeholder"></div>
-        <div class="placeholder"></div>
-        <div class="placeholder"></div>
+  <div class="preloader">
+    <div class="preloader-container">
+      <!-- <img width="80" class="preloader-img" src="assets/img/preloader.png" alt=""> -->
+      <div id="animation-container">
+        <img width="80" src="assets/loader_image_1.png" class="animation-image" alt="" />
+        <img width="80" src="assets/loader_image_2.png" class="animation-image" alt="" />
+        <img width="80" src="assets/loader_image_3.png" class="animation-image" alt="" />
+        <img width="80" src="assets/loader_image_4.png" class="animation-image" alt="" />
+        <img width="80" src="assets/loader_image_5.png" class="animation-image" alt="" />
       </div>
-    </div>
-    <div class="header-end d-flex align-items-center gap-5">
-      <div class="placeholder"></div>
-      <div class="d-flex align-items-center gap-4">
-        <div class="placeholder"></div>
-        <img src="assets/header_icon_1.png" width="16" class="header-icon" loading="eager" alt="">
-        <img src="assets/header_icon_2.png" width="16" class="header-icon" loading="eager" alt="">
-      </div>
+      <div class="loader"></div>
     </div>
   </div>
-</header>
 
-<!-- Script Goes Here -->
-<script>
-        document.addEventListener("DOMContentLoaded", function () {
-        var images = document.querySelectorAll(".animation-image");
-        var currentIndex = 0;
-        function cycleImages() {
-            var currentImage = images[currentIndex];
-            var nextIndex = (currentIndex + 1) % images.length;
-            var nextImage = images[nextIndex];
-            currentImage.style.display = "none";
-            nextImage.style.display = "block";
-            currentIndex = nextIndex;
-        }
-        // Set an interval to call the cycleImages function every 3 seconds
-        setInterval(cycleImages, 250);
-        });
-</script>
 
-<script>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-top-line"></div>
+    <div class="header-container d-flex align-items-center justify-content-between">
+      <div class="header-start d-flex gap-5 align-items-center">
+        <img class="logo" src="assets/logo.png" loading="eager" alt="">
+        <div class="placeholder placeholder-wide"></div>
+        <div class="d-flex align-items-center gap-4">
+          <div class="placeholder"></div>
+          <div class="placeholder"></div>
+          <div class="placeholder"></div>
+          <div class="placeholder"></div>
+        </div>
+      </div>
+      <div class="header-end d-flex align-items-center gap-5">
+        <div class="placeholder"></div>
+        <div class="d-flex align-items-center gap-4">
+          <div class="placeholder"></div>
+          <img src="assets/header_icon_1.png" width="16" class="header-icon" loading="eager" alt="">
+          <img src="assets/header_icon_2.png" width="16" class="header-icon" loading="eager" alt="">
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Script Goes Here -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      var images = document.querySelectorAll(".animation-image");
+      var currentIndex = 0;
+      function cycleImages() {
+        var currentImage = images[currentIndex];
+        var nextIndex = (currentIndex + 1) % images.length;
+        var nextImage = images[nextIndex];
+        currentImage.style.display = "none";
+        nextImage.style.display = "block";
+        currentIndex = nextIndex;
+      }
+      // Set an interval to call the cycleImages function every 3 seconds
+      setInterval(cycleImages, 250);
+    });
+  </script>
+
+  <script>
     // Check if localStorage is supported in the browser
-      if (typeof(Storage) !== "undefined") {
-        // Get the item from localStorage
-        var itemValue = localStorage.getItem("flutter.theme");
-        // Check if the item exists
-        if (itemValue !== null) {
-          // Check the value of the item
-          if (itemValue === "true") {
-            // If the value is "true", add a class to the body
-            document.body.classList.add("theme-dark");
-          } else {
-            // If the value is not "true", remove the class from the body
-            document.body.classList.remove("theme-light");
-          }
+    if (typeof (Storage) !== "undefined") {
+      // Get the item from localStorage
+      var itemValue = localStorage.getItem("flutter.theme");
+      // Check if the item exists
+      if (itemValue !== null) {
+        // Check the value of the item
+        if (itemValue === "true") {
+          // If the value is "true", add a class to the body
+          document.body.classList.add("theme-dark");
         } else {
-          console.log("Item not found in localStorage");
+          // If the value is not "true", remove the class from the body
+          document.body.classList.remove("theme-light");
         }
       } else {
-        console.log("localStorage is not supported in this browser");
+        console.log("Item not found in localStorage");
       }
+    } else {
+      console.log("localStorage is not supported in this browser");
+    }
 
   </script>
 
 
-<script>
+  <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCRuHYcgMpj-CdyLCQ-RNBtCOcPgileI04",
+      authDomain: "food-solutions-1d554.firebaseapp.com",
+      projectId: "food-solutions-1d554",
+      storageBucket: "food-solutions-1d554.appspot.com",
+      messagingSenderId: "188943905318",
+      appId: "1:188943905318:web:d3c5097e54203da1bc6ce7"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+  </script>
+
+  <!-- <script>
     // Your web app's Firebase configuration
     // For Firebase JS SDK v7.20.0 an later, measurementId is optional
     var firebaseConfig = {
@@ -139,7 +165,8 @@
     };
     // Initialize Firebasefi
     firebase.initializeApp(firebaseConfig);
-  </script>
-<script src="main.dart.js?version=10.2" type="application/javascript"></script>
+  </script> -->
+  <script src="main.dart.js?version=10.2" type="application/javascript"></script>
 </body>
+
 </html>

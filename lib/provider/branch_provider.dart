@@ -6,7 +6,6 @@ import 'package:flutter_restaurant/provider/splash_provider.dart';
 import 'package:flutter_restaurant/view/screens/home/home_screen.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-
 import 'package:provider/provider.dart';
 
 class BranchProvider extends ChangeNotifier {
@@ -20,16 +19,17 @@ class BranchProvider extends ChangeNotifier {
   int _branchTabIndex = 0;
   int get branchTabIndex => _branchTabIndex;
 
-  void updateTabIndex(int index, {bool isUpdate = true}) {
+  void updateTabIndex(int index, {bool isUpdate = true}){
     _branchTabIndex = index;
-    if (isUpdate) {
+    if(isUpdate) {
       notifyListeners();
     }
   }
 
+
   void updateBranchId(int? value, {bool isUpdate = true}) {
     _selectedBranchId = value;
-    if (isUpdate) {
+    if(isUpdate) {
       notifyListeners();
     }
   }
@@ -45,37 +45,33 @@ class BranchProvider extends ChangeNotifier {
   Branches? getBranch({int? id}) {
     int branchId = id ?? getBranchId();
     Branches? branch;
-    ConfigModel config =
-        Provider.of<SplashProvider>(Get.context!, listen: false).configModel!;
-    if (config.branches != null && config.branches!.isNotEmpty) {
-      branch = config.branches!
-          .firstWhere((branch) => branch!.id == branchId, orElse: () => null);
-      if (branch == null) {
-        splashRepo!.setBranchId(-1);
-      }
-    }
+   ConfigModel config = Provider.of<SplashProvider>(Get.context!, listen: false).configModel!;
+   if(config.branches != null && config.branches!.isNotEmpty) {
+     branch = config.branches!.firstWhere((branch) => branch!.id == branchId, orElse: () => null);
+     if(branch == null){
+       splashRepo!.setBranchId(-1);
+     }
+   }
     return branch;
   }
 
-  List<BranchValue> branchSort(LatLng? currentLatLng) {
+
+  List<BranchValue> branchSort(LatLng? currentLatLng){
     _isLoading = true;
     List<BranchValue> branchValueList = [];
 
-    for (var branch in Provider.of<SplashProvider>(Get.context!, listen: false)
-        .configModel!
-        .branches!) {
+    for (var branch in Provider.of<SplashProvider>(Get.context!, listen: false).configModel!.branches!) {
       double distance = -1;
-      if (currentLatLng != null) {
+      if(currentLatLng != null) {
         distance = Geolocator.distanceBetween(
-              double.parse(branch!.latitude!),
-              double.parse(branch.longitude!),
-              currentLatLng.latitude,
-              currentLatLng.longitude,
-            ) /
-            1000;
+          double.parse(branch!.latitude!), double.parse(branch.longitude!),
+          currentLatLng.latitude, currentLatLng.longitude,
+        )/ 1000;
       }
 
       branchValueList.add(BranchValue(branch, distance));
+
+
     }
     branchValueList.sort((a, b) => a.distance.compareTo(b.distance));
 
