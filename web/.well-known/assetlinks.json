@@ -1,0 +1,14 @@
+[
+    {
+        "relation": [
+            "delegate_permission/common.handle_all_urls"
+        ],
+        "target": {
+            "namespace": "android_app",
+            "package_name": "com.sixamtech.efood",
+            "sha256_cert_fingerprints": [
+                "F9:24:E3:40:DE:01:43:92:82:24:CB:DE:F8:DC:40:A7:EE:2A:10:61:21:B5:04:A2:1F:3D:D6:64:2C:EC:EE:D6"
+            ]
+        }
+    }
+]
